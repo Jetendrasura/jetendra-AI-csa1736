@@ -1,0 +1,72 @@
+import random
+
+class VacuumCleaner:
+    def __init__(self, size):
+        self.size = size
+        self.grid = [[random.choice([True, False]) for _ in range(size)] for _ in range(size)]
+        self.x = random.randint(0, size - 1)
+        self.y = random.randint(0, size - 1)
+        self.cleaned = 0
+
+    def is_dirty(self, x, y):
+        return self.grid[x][y]
+
+    def clean(self, x, y):
+        if self.is_dirty(x, y):
+            self.grid[x][y] = False
+            self.cleaned += 1
+            print(f"Cleaned cell ({x}, {y})")
+
+    def move_up(self):
+        if self.x > 0:
+            self.x -= 1
+            print("Moved up to", (self.x, self.y))
+
+    def move_down(self):
+        if self.x < self.size - 1:
+            self.x += 1
+            print("Moved down to", (self.x, self.y))
+
+    def move_left(self):
+        if self.y > 0:
+            self.y -= 1
+            print("Moved left to", (self.x, self.y))
+
+    def move_right(self):
+        if self.y < self.size - 1:
+            self.y += 1
+            print("Moved right to", (self.x, self.y))
+
+    def clean_environment(self):
+        while self.cleaned < self.size * self.size:
+            if self.is_dirty(self.x, self.y):
+                self.clean(self.x, self.y)
+            if self.x % 2 == 0:  # Move horizontally
+                if self.y == 0:
+                    self.move_right()
+                else:
+                    self.move_left()
+            else:  # Move vertically
+                if self.x == 0:
+                    self.move_down()
+                else:
+                    self.move_up()
+            print("Current environment:")
+            self.print_environment()
+            print()
+        print("Cleaning complete. All cells cleaned.")
+
+    def print_environment(self):
+        for row in self.grid:
+            print(" ".join("D" if cell else "C" for cell in row))
+        print()
+
+
+# Example usage:
+size_of_environment = 5
+print(f"Initializing a {size_of_environment}x{size_of_environment} environment for the vacuum cleaner.")
+vacuum = VacuumCleaner(size_of_environment)
+print("Initial environment:")
+vacuum.print_environment()
+print("Starting cleaning process:")
+vacuum.clean_environment()
