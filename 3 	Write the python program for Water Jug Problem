@@ -1,0 +1,99 @@
+from collections import deque
+
+# Function to perform BFS to find the shortest path to reach the target state
+def bfs_waterjug(jug1_max, jug2_max, target):
+    # Initial state of jugs
+    initial_state = (0, 0)
+    # Queue for BFS
+    queue = deque([initial_state])
+    # Visited states
+    visited = set()
+    visited.add(initial_state)
+    # Dictionary to store parent state for path reconstruction
+    parent = {initial_state: None}
+
+    while queue:
+        current_state = queue.popleft()
+
+        # Check if we have reached the target state
+        if current_state[0] == target or current_state[1] == target:
+            path = []
+            # Reconstruct path from target state to initial state
+            while current_state is not None:
+                path.append(current_state)
+                current_state = parent[current_state]
+            path.reverse()
+            return path
+        
+        # Try all possible operations: fill jug1, fill jug2, empty jug1, empty jug2,
+        # pour jug1 to jug2, pour jug2 to jug1
+        
+        # Fill jug1
+        if current_state[0] < jug1_max:
+            next_state = (jug1_max, current_state[1])
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+        
+        # Fill jug2
+        if current_state[1] < jug2_max:
+            next_state = (current_state[0], jug2_max)
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+        
+        # Empty jug1
+        if current_state[0] > 0:
+            next_state = (0, current_state[1])
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+        
+        # Empty jug2
+        if current_state[1] > 0:
+            next_state = (current_state[0], 0)
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+        
+        # Pour jug1 to jug2
+        if current_state[0] > 0 and current_state[1] < jug2_max:
+            amount_to_pour = min(current_state[0], jug2_max - current_state[1])
+            next_state = (current_state[0] - amount_to_pour, current_state[1] + amount_to_pour)
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+        
+        # Pour jug2 to jug1
+        if current_state[1] > 0 and current_state[0] < jug1_max:
+            amount_to_pour = min(current_state[1], jug1_max - current_state[0])
+            next_state = (current_state[0] + amount_to_pour, current_state[1] - amount_to_pour)
+            if next_state not in visited:
+                visited.add(next_state)
+                parent[next_state] = current_state
+                queue.append(next_state)
+    
+    # If no solution found
+    return None
+
+def solve_waterjug(jug1_max, jug2_max, target):
+    path = bfs_waterjug(jug1_max, jug2_max, target)
+    if path:
+        print(f"Solution found with {len(path) - 1} steps:")
+        for step in path:
+            print(step)
+    else:
+        print("No solution found.")
+
+# Example usage:
+jug1_capacity = 4
+jug2_capacity = 3
+target_amount = 2
+
+print(f"Starting with jugs of capacities {jug1_capacity} and {jug2_capacity}, finding a way to measure out {target_amount} liters:")
+solve_waterjug(jug1_capacity, jug2_capacity, target_amount)
