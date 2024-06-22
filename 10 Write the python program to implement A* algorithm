@@ -1,0 +1,67 @@
+import heapq
+
+class Graph:
+    def __init__(self):
+        self.adjacency_list = {}
+
+    def add_edge(self, u, v, weight):
+        if u not in self.adjacency_list:
+            self.adjacency_list[u] = []
+        if v not in self.adjacency_list:
+            self.adjacency_list[v] = []
+        self.adjacency_list[u].append((v, weight))
+        # Uncomment below for undirected graph
+        # self.adjacency_list[v].append((u, weight))
+
+    def astar(self, start_node, goal_node, heuristic):
+        open_list = [(0, start_node)]  # (f_cost, node)
+        came_from = {}
+        g_cost = {node: float('inf') for node in self.adjacency_list}
+        g_cost[start_node] = 0
+
+        while open_list:
+            current_cost, current_node = heapq.heappop(open_list)
+
+            if current_node == goal_node:
+                path = []
+                while current_node in came_from:
+                    path.append(current_node)
+                    current_node = came_from[current_node]
+                path.append(start_node)
+                path.reverse()
+                return path, current_cost
+
+            for neighbor, weight in self.adjacency_list[current_node]:
+                tentative_g_cost = g_cost[current_node] + weight
+                if tentative_g_cost < g_cost[neighbor]:
+                    g_cost[neighbor] = tentative_g_cost
+                    f_cost = tentative_g_cost + heuristic[neighbor]
+                    heapq.heappush(open_list, (f_cost, neighbor))
+                    came_from[neighbor] = current_node
+
+        return None, float('inf')
+
+# Example usage:
+if __name__ == "__main__":
+    g = Graph()
+    g.add_edge('A', 'B', 5)
+    g.add_edge('A', 'C', 2)
+    g.add_edge('B', 'D', 4)
+    g.add_edge('C', 'D', 6)
+    g.add_edge('C', 'E', 3)
+    g.add_edge('D', 'E', 1)
+
+    start_node = 'A'
+    goal_node = 'E'
+    heuristic = {'A': 6, 'B': 4, 'C': 3, 'D': 1, 'E': 0}  # Heuristic estimates for A* algorithm
+
+    path, total_cost = g.astar(start_node, goal_node, heuristic)
+
+    if path:
+        print(f"Shortest path from {start_node} to {goal_node}: {path}")
+        print(f"Total cost: {total_cost}")
+    else:
+        print(f"No path found from {start_node} to {goal_node}")
+
+              
+  
