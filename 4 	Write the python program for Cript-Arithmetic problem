@@ -1,0 +1,51 @@
+def solve_cryptarithmetic(puzzle):
+    words = puzzle.split()
+    unique_chars = set(''.join(words))
+    if len(unique_chars) > 10:
+        print("Invalid puzzle: More than 10 unique characters")
+        return None
+    
+    chars = list(unique_chars)
+    n = len(chars)
+    digits = [-1] * 10
+    used = [False] * 10
+    first_letters = set(word[0] for word in words)
+    
+    if len(first_letters) > 3:
+        print("Invalid puzzle: More than 3 words start with the same letter")
+        return None
+    
+    def is_valid():
+        if len(chars) > 1 and digits[chars.index(words[0][0])] == 0:
+            return False
+        return all(digits[chars.index(word[0])] != 0 for word in words)
+    
+    def solve(index):
+        if index == n:
+            num1 = sum(digits[chars.index(char)] * (10 ** (len(char) - 1)) for char in words[0])
+            num2 = sum(digits[chars.index(char)] * (10 ** (len(char) - 1)) for char in words[1])
+            sum_val = sum(digits[chars.index(char)] * (10 ** (len(char) - 1)) for char in words[2])
+            return num1 + num2 == sum_val
+        
+        for digit in range(10):
+            if not used[digit]:
+                used[digit] = True
+                digits[index] = digit
+                if is_valid() and solve(index + 1):
+                    return True
+                used[digit] = False
+        
+        return False
+    
+    if solve(0):
+        solution = {chars[i]: digits[i] for i in range(n)}
+        for word in words:
+            print(''.join(str(solution[char]) for char in word), end=' ')
+        print()
+    else:
+        print("No solution found.")
+
+# Example usage:
+puzzle = "SEND + MORE = MONEY"
+print("Solving puzzle:", puzzle)
+solve_cryptarithmetic(puzzle)
