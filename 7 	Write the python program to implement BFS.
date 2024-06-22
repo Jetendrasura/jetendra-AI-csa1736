@@ -1,0 +1,42 @@
+from collections import deque
+
+class Graph:
+    def __init__(self):
+        self.adjacency_list = {}
+
+    def add_edge(self, u, v):
+        if u not in self.adjacency_list:
+            self.adjacency_list[u] = []
+        if v not in self.adjacency_list:
+            self.adjacency_list[v] = []
+        self.adjacency_list[u].append(v)
+        self.adjacency_list[v].append(u)  # Uncomment for undirected graph
+
+    def bfs(self, start_node):
+        visited = {}
+        for node in self.adjacency_list:
+            visited[node] = False
+
+        queue = deque([start_node])
+        visited[start_node] = True
+
+        while queue:
+            current_node = queue.popleft()
+            print(current_node, end=' ')
+
+            for neighbor in self.adjacency_list[current_node]:
+                if not visited[neighbor]:
+                    queue.append(neighbor)
+                    visited[neighbor] = True
+
+# Example usage:
+g = Graph()
+g.add_edge(0, 1)
+g.add_edge(0, 2)
+g.add_edge(1, 2)
+g.add_edge(2, 0)
+g.add_edge(2, 3)
+g.add_edge(3, 3)
+
+print("Breadth-First Traversal starting from node 2:")
+g.bfs(2)
